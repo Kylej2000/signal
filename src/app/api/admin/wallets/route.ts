@@ -12,6 +12,10 @@ const VALID_STATUS = new Set([
   "community_reported",
   "unverified",
 ]);
+const VALID_CHAINS = new Set([
+  "solana", "ethereum", "bnb", "avalanche", "base", "arbitrum",
+  "optimism", "polygon", "robinhood_chain",
+]);
 
 export async function POST(req: Request) {
   if (!checkAdminAuth(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -23,6 +27,14 @@ export async function POST(req: Request) {
   const status = VALID_STATUS.has(body.verification_status)
     ? body.verification_status
     : "unverified";
+  const chain = VALID_CHAINS.has(body.chain) ? body.chain : "solana";
+  const address = body.address.trim();
+  if (chain === "solana" && !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)) {
+    return NextResponse.json({ error: "That is not a valid Solana address." }, { status: 400 });
+  }
+  if (chain !== "solana" && !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+    return NextResponse.json({ error: "That chain requires a 0x wallet address." }, { status: 400 });
+  }
 
   if (isDemoMode()) {
     return NextResponse.json({
@@ -36,8 +48,8 @@ export async function POST(req: Request) {
 
   const { error } = await supabase.from("wallets").insert({
     influencer_id: body.influencer_id,
-    address: body.address.trim(),
-    chain: body.chain || "solana",
+    address,
+    chain,
     label: body.label || null,
     verification_status: status,
     verification_source: body.verification_source || null,
