@@ -1,80 +1,63 @@
 import { NextResponse } from "next/server";
-import { checkAdminAuth, slugify } from "@/lib/admin-auth";
+import { config } from "@/lib/config";
 import { getAdminClient } from "@/lib/supabase/server";
-import { isDemoMode } from "@/lib/config";
-import { demoInfluencers, demoWallets } from "@/lib/demo-data";
+import { parseRpcSwap, parsedTransaction, recentSignatures } from "@/lib/solana/rpc";
+import { processParsedSwap, type WalletRecord } from "@/lib/signals/create";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
-export async function GET(req: Request) {
-  if (!checkAdminAuth(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-
-  if (isDemoMode()) {
-    return NextResponse.json({
-      demo: true,
-      influencers: demoInfluencers.map((i) => ({
-        id: i.id,
-        name: i.name,
-        slug: i.slug,
-        x_handle: i.x_handle,
-        followers: i.followers,
-        active: i.active,
-        wallets: demoWallets
-          .filter((w) => w.influencer_id === i.id)
-          .map((w) => ({
-            id: w.id,
-            address: w.address,
-            verification_status: w.verification_status,
-            active: w.active,
-          })),
-      })),
-    });
-  }
-
-  const supabase = getAdminClient();
-  if (!supabase) return NextResponse.json({ demo: true, influencers: [] });
-
-  const { data: influencers } = await supabase.from("influencers").select("*").order("name");
-  const { data: wallets } = await supabase.from("wallets").select("*");
-  const merged = (influencers ?? []).map((i: any) => ({
-    ...i,
-    wallets: (wallets ?? []).filter((w: any) => w.influencer_id === i.id),
-  }));
-  return NextResponse.json({ demo: false, influencers: merged });
+function authorized(req: Request): boolean {
+  const secret = config.solanaCronSecret;
+  if (!secret) return false;
+  const auth = req.headers.get("authorization");
+  const querySecret = new URL(req.url).searchParams.get("secret");
+  return auth === `Bearer ${secret}` || querySecret === secret;
 }
 
-export async function POST(req: Request) {
-  if (!checkAdminAuth(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+/** Free MVP poller: public Solana RPC -> existing signal pipeline. */
+export async function GET(req: Request) {
+  if (!authorized(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const supabase = getAdminClient();
+  if (!supabase) return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
 
-  const body = await req.json().catch(() => ({}));
-  if (!body.name) return NextResponse.json({ error: "name is required" }, { status: 400 });
+  const { data, error } = await supabase
+    .from("wallets")
+    .select("id, influencer_id, address, verification_status")
+    .eq("active", true);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  if (isDemoMode()) {
-    return NextResponse.json({
-      message: "Demo mode — influencer not persisted. Configure Supabase to save.",
-      demo: true,
-    });
+  const wallets = (data ?? []) as WalletRecord[];
+  const summary = { wallets: wallets.length, checked: 0, swaps: 0, created: 0, duplicates: 0, errors: 0 };
+  const details: Array<{ wallet: string; signature?: string; status: string; detail?: string }> = [];
+
+  for (const wallet of wallets) {
+    try {
+      const signatures = (await recentSignatures(wallet.address)).filter((s) => !s.err).reverse();
+      for (const sig of signatures) {
+        summary.checked++;
+        try {
+          const tx = await parsedTransaction(sig.signature);
+          if (!tx) continue;
+          const swap = parseRpcSwap(tx, wallet.address);
+          if (!swap) continue;
+          summary.swaps++;
+          const result = await processParsedSwap(supabase, swap, wallet);
+          if (result.status === "created") summary.created++;
+          else if (result.status === "duplicate") summary.duplicates++;
+          else summary.errors++;
+          details.push({ wallet: wallet.address, signature: sig.signature, status: result.status, detail: result.detail });
+        } catch (e) {
+          summary.errors++;
+          details.push({ wallet: wallet.address, signature: sig.signature, status: "error", detail: (e as Error).message });
+        }
+      }
+    } catch (e) {
+      summary.errors++;
+      details.push({ wallet: wallet.address, status: "error", detail: (e as Error).message });
+    }
   }
 
-  const supabase = getAdminClient();
-  if (!supabase) return NextResponse.json({ error: "Supabase not configured" }, { status: 400 });
-
-  const handle = (body.x_handle ?? "").replace(/^@/, "") || null;
-  const { data, error } = await supabase
-    .from("influencers")
-    .insert({
-      name: body.name,
-      slug: slugify(body.name),
-      x_handle: handle,
-      profile_image: body.profile_image || null,
-      followers: body.followers ?? null,
-      description: body.description || null,
-      category: body.category || body.description || null,
-      active: true,
-    })
-    .select("id, slug")
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  return NextResponse.json({ message: `Added ${body.name}.`, influencer: data });
+  return NextResponse.json({ ok: true, provider: "solana-public-rpc", summary, details });
 }
