@@ -2,7 +2,7 @@
   "name": "signal",
   "version": "0.1.0",
   "private": true,
-  "description": "Signal — real-time crypto influencer wallet & social activity tracker (Solana MVP)",
+  "description": "Signal — multichain crypto influencer wallet and social activity tracker",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
