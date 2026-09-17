@@ -14,6 +14,7 @@ interface AdminInfluencer {
   wallets: {
     id: string;
     address: string;
+    chain: string;
     verification_status: string;
     active: boolean;
   }[];
@@ -168,6 +169,7 @@ export default function AdminPage() {
                     <span className="tabular text-xs text-muted">{w.address}</span>
                     <div className="flex items-center gap-2">
                       <VerifBadge status={w.verification_status} />
+                      <Badge tone="muted">{chainLabel(w.chain)}</Badge>
                       <span
                         className={clsx(
                           "h-1.5 w-1.5 rounded-full",
@@ -264,6 +266,14 @@ function AddWalletForm({
             className="w-full rounded-lg border border-ink-700 bg-ink-900 px-3 py-2 text-sm outline-none focus:border-signal/50"
           >
             <option value="solana">Solana</option>
+            <option value="ethereum">Ethereum</option>
+            <option value="bnb">BNB Chain</option>
+            <option value="avalanche">Avalanche C-Chain</option>
+            <option value="base">Base</option>
+            <option value="arbitrum">Arbitrum One</option>
+            <option value="optimism">Optimism</option>
+            <option value="polygon">Polygon</option>
+            <option value="robinhood_chain">Robinhood Chain</option>
           </select>
         </Field>
         <Input label="Label" value={f.label} onChange={(v) => setF({ ...f, label: v })} />
@@ -300,6 +310,15 @@ function AddWalletForm({
       </p>
     </form>
   );
+}
+
+function chainLabel(chain: string): string {
+  const labels: Record<string, string> = {
+    solana: "Solana", ethereum: "Ethereum", bnb: "BNB", avalanche: "Avalanche",
+    base: "Base", arbitrum: "Arbitrum", optimism: "Optimism", polygon: "Polygon",
+    robinhood_chain: "Robinhood Chain",
+  };
+  return labels[chain] ?? chain;
 }
 
 function VerifBadge({ status }: { status: string }) {
