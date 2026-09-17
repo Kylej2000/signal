@@ -44,7 +44,8 @@ export async function POST(req: Request) {
   const { data: wallets, error } = await supabase
     .from("wallets")
     .select("id, influencer_id, address, verification_status, active")
-    .eq("active", true);
+    .eq("active", true)
+    .eq("chain", "solana");
   if (error) {
     return NextResponse.json({ error: "wallet lookup failed" }, { status: 500 });
   }
