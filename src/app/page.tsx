@@ -15,7 +15,7 @@ export default async function HomePage() {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-ink-700 bg-ink-850 px-3 py-1 text-xs text-muted">
             <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-signal" />
-            Real-time Solana intelligence
+            Real-time multichain intelligence
           </div>
           <h1 className="mt-5 text-balance text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
             Know When They Buy.
@@ -34,7 +34,7 @@ export default async function HomePage() {
           </div>
           <dl className="mt-10 grid max-w-lg grid-cols-3 gap-4">
             <HeroStat value="~5s" label="Detection latency" />
-            <HeroStat value="Solana" label="Chain (MVP)" />
+            <HeroStat value="9" label="Supported chains" />
             <HeroStat value="Wallet + X" label="Two data streams" />
           </dl>
         </div>
@@ -56,7 +56,7 @@ export default async function HomePage() {
       <section className="mt-24 grid gap-4 md:grid-cols-3">
         <FeatureCard
           title="Public wallet buys"
-          body="Monitor publicly identified Solana wallets. Get alerted the moment a tracked wallet swaps SOL or a stablecoin for a token — not on every incoming transfer."
+          body="Monitor publicly identified wallets across Solana and major EVM networks. Get alerted when a tracked wallet swaps a native asset or stablecoin for a token — not on every incoming transfer."
           icon="wallet"
         />
         <FeatureCard
