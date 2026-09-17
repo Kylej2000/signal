@@ -25,7 +25,8 @@ export async function GET(req: Request) {
   const { data, error } = await supabase
     .from("wallets")
     .select("id, influencer_id, address, verification_status")
-    .eq("active", true);
+    .eq("active", true)
+    .eq("chain", "solana");
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const wallets = (data ?? []) as WalletRecord[];
