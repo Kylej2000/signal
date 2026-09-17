@@ -57,7 +57,19 @@ monitored-address list to your Helius webhook.
 
 ---
 
-## 3. Helius — Solana wallet monitoring
+## 3. Free Solana wallet monitoring (recommended for validation)
+
+Signal can poll Solana's public RPC without a paid data provider. Set a long random
+`SOLANA_CRON_SECRET` in Vercel, redeploy, then open
+`supabase/free-wallet-poller.sql`. Replace the domain and secret placeholders and run it
+in Supabase SQL Editor. Supabase will call `/api/cron/solana` every five minutes.
+
+The route checks active wallets, parses wallet-owned SOL and SPL-token balance changes,
+rejects plain transfers, and sends detected swaps through the same enrichment and alert
+pipeline as Helius. Public RPC is suitable for MVP validation but may be rate-limited or
+slower under load.
+
+## 4. Optional upgrade: Helius webhooks
 
 1. Create an API key at https://dev.helius.xyz and set `HELIUS_API_KEY`.
 2. Invent a strong secret and set `HELIUS_WEBHOOK_SECRET` (used to authenticate incoming
@@ -84,7 +96,7 @@ URL, or POST a sample enhanced-transaction payload to `/api/webhooks/helius` wit
 
 ---
 
-## 4. Token enrichment (DexScreener / Birdeye)
+## 5. Token enrichment (DexScreener / Birdeye)
 
 - **DexScreener** needs no key and is used by default for name, ticker, price, market
   cap, liquidity and the DexScreener link.
@@ -95,7 +107,7 @@ URL, or POST a sample enhanced-transaction payload to `/api/webhooks/helius` wit
 
 ---
 
-## 5. X / Twitter — social monitoring
+## 6. X / Twitter — social monitoring
 
 1. Get an app-only **Bearer token** from the X developer portal and set `X_BEARER_TOKEN`.
 2. Set `TWITTER_CRON_SECRET` to protect the polling endpoint.
@@ -114,7 +126,7 @@ buy, a `correlated` signal with the exact time gap.
 
 ---
 
-## 6. Alerts (Telegram / Discord / Email)
+## 7. Alerts (Telegram / Discord / Email)
 
 In-app alerts work out of the box (the live feed). To add push channels, set any of:
 
@@ -132,7 +144,7 @@ Adding a brand-new channel is implementing the `AlertChannel` interface in
 
 ---
 
-## 7. Deploy to Vercel
+## 8. Deploy to Vercel
 
 1. Push this repo to GitHub and import it in Vercel.
 2. Add every environment variable from `.env.example` in **Project → Settings →

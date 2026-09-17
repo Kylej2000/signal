@@ -36,7 +36,7 @@ sample item carries a Demo tag.
 - **Next.js 15** (App Router) + **TypeScript**
 - **Tailwind CSS** (dark Bloomberg-terminal aesthetic)
 - **Supabase / Postgres** (data + realtime)
-- **Helius** (Solana wallet monitoring via webhooks)
+- **Solana public RPC** (free five-minute wallet polling) or optional **Helius** webhooks
 - **DexScreener / Birdeye** (token enrichment + price snapshots)
 - **X API v2** (social monitoring)
 - Alert channels: **in-app** (live), plus ready-to-enable **Telegram / Discord / Email**
@@ -49,7 +49,8 @@ See **[SETUP.md](./SETUP.md)** for the full walkthrough. In short:
 1. Create a Supabase project, run `supabase/schema.sql` (and optionally `supabase/seed.sql`).
 2. Copy `.env.example` → `.env.local`, fill in Supabase keys, set `NEXT_PUBLIC_DEMO_MODE=false`.
 3. Add influencers + wallets in `/admin`.
-4. Create a Helius enhanced webhook pointing at `/api/webhooks/helius`.
+4. For the free MVP, schedule `/api/cron/solana` with `supabase/free-wallet-poller.sql`.
+   Helius webhooks remain available as an optional faster upgrade.
 5. (Optional) Add an X bearer token + a cron to poll `/api/cron/twitter`.
 6. (Optional) Add Telegram / Discord / email credentials for push alerts.
 
