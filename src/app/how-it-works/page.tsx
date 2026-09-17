@@ -23,7 +23,7 @@ export default function HowItWorks() {
         eyebrow="Pipeline A — Wallet"
         title="Public wallet → buy detected → live signal"
         steps={[
-          ["Tracked wallet", "A public Solana address attributed to an influencer, stored with its verification status."],
+          ["Tracked wallet", "A public blockchain address attributed to an influencer, stored with its chain and verification status."],
           ["Helius stream", "Helius webhooks push transactions for monitored addresses to Signal in near real-time."],
           ["Swap parser", "We detect swaps where the wallet exchanges SOL / USDC / USDT for an SPL token — not ordinary transfers."],
           ["Token enrichment", "The received token is enriched via DexScreener / Birdeye: name, ticker, price, market cap, liquidity."],
