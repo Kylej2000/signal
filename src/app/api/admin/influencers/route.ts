@@ -24,6 +24,7 @@ export async function GET(req: Request) {
           .map((w) => ({
             id: w.id,
             address: w.address,
+            chain: w.chain,
             verification_status: w.verification_status,
             active: w.active,
           })),
