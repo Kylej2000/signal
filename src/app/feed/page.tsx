@@ -16,7 +16,7 @@ export default async function FeedPage() {
         </div>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">Signal terminal</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Wallet buys and social mentions from tracked Solana influencers, newest first.
+          Wallet buys and social mentions from tracked influencers across supported chains, newest first.
           Correlated events — a wallet buy followed by a matching post — are highlighted.
         </p>
       </div>
