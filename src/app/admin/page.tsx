@@ -69,6 +69,16 @@ export default function AdminPage() {
     return true;
   };
 
+  const removeSamples = async () => {
+    setError(null);
+    setNotice(null);
+    const res = await fetch("/api/admin/influencers", { method: "DELETE", headers: headers() });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) return setError(json.error ?? "Cleanup failed.");
+    setNotice(json.message ?? "Sample records removed.");
+    await load();
+  };
+
   if (!authed) {
     return (
       <div className="mx-auto max-w-sm py-24">
@@ -144,7 +154,12 @@ export default function AdminPage() {
       </div>
 
       <div className="mt-10">
-        <h2 className="text-lg font-semibold">Tracked influencers & wallets</h2>
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold">Tracked influencers & wallets</h2>
+          <button onClick={removeSamples} className="text-xs text-sell hover:underline">
+            Remove sample data
+          </button>
+        </div>
         <div className="mt-4 space-y-3">
           {data.map((inf) => (
             <div key={inf.id} className="rounded-xl border border-ink-700 bg-ink-850 p-4">
