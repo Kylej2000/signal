@@ -315,5 +315,5 @@ export async function getStats(influencerId: string): Promise<InfluencerStats> {
 export async function getCorrelations(influencerId: string): Promise<FeedItem[]> {
   if (isDemoMode()) return demoCorrelations(influencerId);
   const all = await getFeed({ types: ["correlated"], limit: 100 });
-  return all.filter((f) => f.influencer.id === influencerId);
+  return all.filter((f) => f.influencer.id === influencerId && f.correlation && f.post);
 }
