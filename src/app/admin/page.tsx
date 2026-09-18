@@ -79,6 +79,16 @@ export default function AdminPage() {
     await load();
   };
 
+  const importKols = async () => {
+    setError(null);
+    setNotice(null);
+    const res = await fetch("/api/admin/import-kols", { method: "POST", headers: headers() });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) return setError(json.error ?? "Import failed.");
+    setNotice(json.message ?? "KOL wallets imported.");
+    await load();
+  };
+
   if (!authed) {
     return (
       <div className="mx-auto max-w-sm py-24">
@@ -156,9 +166,14 @@ export default function AdminPage() {
       <div className="mt-10">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Tracked influencers & wallets</h2>
-          <button onClick={removeSamples} className="text-xs text-sell hover:underline">
-            Remove sample data
-          </button>
+          <div className="flex items-center gap-4">
+            <button onClick={importKols} className="text-xs font-semibold text-signal hover:underline">
+              Import top 50 KOL wallets
+            </button>
+            <button onClick={removeSamples} className="text-xs text-sell hover:underline">
+              Remove sample data
+            </button>
+          </div>
         </div>
         <div className="mt-4 space-y-3">
           {data.map((inf) => (
