@@ -139,7 +139,7 @@ export function LiveFeed({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <Filters value={filters} onChange={setFilters} influencers={influencers} />
+        <Filters value={filters} onChange={setFilters} influencers={influencers} showTypes={!buyOnly} />
       </div>
 
       <div className="flex items-center justify-between px-1">

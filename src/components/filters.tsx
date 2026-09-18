@@ -44,16 +44,18 @@ export function Filters({
   value,
   onChange,
   influencers,
+  showTypes = true,
 }: {
   value: FeedFilterState;
   onChange: (next: FeedFilterState) => void;
   influencers: { slug: string; name: string }[];
+  showTypes?: boolean;
 }) {
   const set = (patch: Partial<FeedFilterState>) => onChange({ ...value, ...patch });
 
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-ink-700 bg-ink-850/60 p-3 lg:flex-row lg:items-center lg:justify-between">
-      <div className="inline-flex rounded-lg border border-ink-700 bg-ink-900 p-0.5">
+      {showTypes && <div className="inline-flex rounded-lg border border-ink-700 bg-ink-900 p-0.5">
         {typeTabs.map((t) => (
           <button
             key={t.key}
@@ -68,7 +70,7 @@ export function Filters({
             {t.label}
           </button>
         ))}
-      </div>
+      </div>}
 
       <div className="flex flex-wrap items-center gap-2">
         <Select
