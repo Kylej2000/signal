@@ -31,10 +31,11 @@ export interface EnrichedToken {
 export async function enrichToken(
   mint: string,
   blockUnixSeconds?: number,
+  chainId = "solana",
 ): Promise<EnrichedToken> {
   const [ds, be] = await Promise.all([
-    getDexScreenerInfo(mint),
-    getBirdeyeOverview(mint),
+    getDexScreenerInfo(mint, chainId),
+    chainId === "solana" ? getBirdeyeOverview(mint) : Promise.resolve(null),
   ]);
 
   const symbol = ds?.symbol ?? be?.symbol ?? null;
@@ -49,7 +50,7 @@ export async function enrichToken(
   let priceSource: EnrichedToken["price_source"] = "dexscreener_current";
 
   // Try to snapshot price at block time via Birdeye.
-  if (blockUnixSeconds) {
+  if (blockUnixSeconds && chainId === "solana") {
     const hist = await getBirdeyeHistoricalPrice(mint, blockUnixSeconds);
     if (hist && hist > 0) {
       price = hist;
@@ -66,7 +67,7 @@ export async function enrichToken(
     symbol,
     name,
     image_url: ds?.imageUrl ?? null,
-    dexscreener_url: ds?.pairUrl ?? `https://dexscreener.com/solana/${mint}`,
+    dexscreener_url: ds?.pairUrl ?? `https://dexscreener.com/${chainId}/${mint}`,
     dex: ds?.dex ?? null,
     token_price: price,
     market_cap: marketCap,
@@ -80,10 +81,20 @@ export async function quoteUsdValue(
   quoteSymbol: string,
   quoteAmount: number,
 ): Promise<number | null> {
-  if (quoteSymbol === "USDC" || quoteSymbol === "USDT") return quoteAmount;
+  if (["USDC", "USDT", "USDbC", "DAI"].includes(quoteSymbol)) return quoteAmount;
   if (quoteSymbol === "SOL") {
     const solPrice = await getSolPrice();
     return solPrice ? quoteAmount * solPrice : null;
+  }
+  const nativeAddresses: Record<string, string> = {
+    ETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    BNB: "0x55d398326f99059fF775485246999027B3197955",
+    AVAX: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",
+    POL: "0x0d500B1d8E8eDB8E10D9757a82e2279Bf0eE0D3",
+  };
+  if (nativeAddresses[quoteSymbol]) {
+    const info = await getDexScreenerInfo(nativeAddresses[quoteSymbol]);
+    return info?.priceUsd ? quoteAmount * info.priceUsd : null;
   }
   return null;
 }

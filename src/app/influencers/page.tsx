@@ -14,7 +14,7 @@ export default async function InfluencersPage() {
         </div>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">Tracked influencers</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Public figures whose publicly identified Solana wallets and X accounts are
+          Public figures whose publicly identified blockchain wallets and X accounts are
           monitored. Wallet attribution is labelled by verification status — only verified
           and publicly disclosed wallets generate production alerts by default.
         </p>

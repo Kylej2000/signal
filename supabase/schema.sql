@@ -1,6 +1,6 @@
 -- ============================================================================
 -- SIGNAL — Postgres / Supabase schema
--- Solana MVP: influencer wallet + social activity tracker.
+-- Multichain influencer wallet + social activity tracker.
 --
 -- Run this in the Supabase SQL editor (or `supabase db push`) once you are
 -- ready to move off DEMO_MODE. Idempotent-friendly: uses IF NOT EXISTS where
@@ -13,7 +13,7 @@ create extension if not exists "pgcrypto";
 -- Enums
 -- ----------------------------------------------------------------------------
 do $$ begin
-  create type chain as enum ('solana');
+  create type chain as enum ('solana','ethereum','bnb','avalanche','base','arbitrum','optimism','polygon','robinhood_chain');
 exception when duplicate_object then null; end $$;
 
 do $$ begin
@@ -115,6 +115,8 @@ create table if not exists transactions (
   transaction_type  transaction_type not null default 'buy',
   token_amount      numeric,                -- tokens received (buy) / sent (sell)
   sol_amount        numeric,                -- SOL spent / received
+  quote_amount      numeric,                -- native/stable quote spent or received
+  quote_symbol      text,                   -- SOL, ETH, BNB, USDC, etc.
   usd_value         numeric,
   token_price       numeric,                -- snapshot at block time
   market_cap        numeric,                -- snapshot at block time
@@ -293,12 +295,15 @@ select
   t.contract_address,
   t.image_url as token_image,
   t.dexscreener_url,
+  t.chain,
   tx.id as transaction_id,
   tx.transaction_hash,
   tx.transaction_type,
   tx.usd_value,
   tx.token_amount,
   tx.sol_amount,
+  tx.quote_amount,
+  tx.quote_symbol,
   tx.market_cap,
   tx.liquidity,
   tx.token_price,

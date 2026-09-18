@@ -103,6 +103,7 @@ function mapRow(row: any): FeedItem {
           contract_address: row.contract_address,
           image_url: row.token_image ?? null,
           dexscreener_url: row.dexscreener_url ?? null,
+          chain: row.chain ?? "solana",
         }
       : null,
     transaction: row.transaction_id
@@ -113,6 +114,8 @@ function mapRow(row: any): FeedItem {
           usd_value: row.usd_value,
           token_amount: row.token_amount,
           sol_amount: row.sol_amount,
+          quote_amount: row.quote_amount ?? row.sol_amount,
+          quote_symbol: row.quote_symbol ?? (row.sol_amount ? "SOL" : null),
           market_cap: row.market_cap,
           liquidity: row.liquidity,
           token_price: row.token_price,
@@ -122,6 +125,7 @@ function mapRow(row: any): FeedItem {
           price_source: row.price_source,
           // Only expose (masked) wallet addresses for attributed wallets.
           wallet_address_masked: isVerified ? maskAddress(row.wallet_address) : null,
+          chain: row.chain ?? "solana",
         }
       : null,
     post: row.social_post_id
@@ -216,7 +220,7 @@ export async function getDirectory(): Promise<InfluencerDirectoryEntry[]> {
         ...inf,
         wallet_count: w.length,
         verified_wallet_count: verified.length,
-        primary_chain: "solana" as const,
+        primary_chain: (w[0]?.chain ?? "solana") as InfluencerDirectoryEntry["primary_chain"],
         last_activity: la?.created_at ?? null,
       };
     });

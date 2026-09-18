@@ -61,9 +61,10 @@ export function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 }
 
-  export const config = {
-solanaRpcUrl: process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com",
+export const config = {
+  solanaRpcUrl: process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com",
   solanaCronSecret: process.env.SOLANA_CRON_SECRET,
+  multichainCronSecret: process.env.MULTICHAIN_CRON_SECRET || process.env.SOLANA_CRON_SECRET,
   heliusApiKey: process.env.HELIUS_API_KEY,
   heliusWebhookSecret: process.env.HELIUS_WEBHOOK_SECRET,
   heliusWebhookId: process.env.HELIUS_WEBHOOK_ID,

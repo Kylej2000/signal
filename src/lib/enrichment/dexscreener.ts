@@ -32,7 +32,7 @@ function dexLabel(dexId?: string | null): string | null {
 }
 
 /** Fetch the best (highest-liquidity Solana) pair for a token mint. */
-export async function getDexScreenerInfo(mint: string): Promise<DexPairInfo | null> {
+export async function getDexScreenerInfo(mint: string, chainId?: string): Promise<DexPairInfo | null> {
   try {
     const res = await fetch(`${BASE}/${mint}`, {
       headers: { accept: "application/json" },
@@ -42,7 +42,7 @@ export async function getDexScreenerInfo(mint: string): Promise<DexPairInfo | nu
     if (!res.ok) return null;
     const json = (await res.json()) as any;
     const pairs: any[] = (json?.pairs ?? []).filter(
-      (p: any) => p?.chainId === "solana",
+      (p: any) => !chainId || p?.chainId === chainId,
     );
     if (!pairs.length) return null;
 
@@ -59,7 +59,7 @@ export async function getDexScreenerInfo(mint: string): Promise<DexPairInfo | nu
       fdv: numeric(p?.fdv),
       liquidityUsd: numeric(p?.liquidity?.usd),
       dex: dexLabel(p?.dexId),
-      pairUrl: p?.url ?? `https://dexscreener.com/solana/${mint}`,
+      pairUrl: p?.url ?? `https://dexscreener.com/${chainId ?? "solana"}/${mint}`,
     };
   } catch {
     return null;

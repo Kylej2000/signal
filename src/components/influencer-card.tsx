@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { InfluencerDirectoryEntry } from "@/lib/types";
 import { Avatar, Badge } from "@/components/ui/primitives";
 import { compactNumber, timeAgo } from "@/lib/format";
+import { chainLabel } from "@/lib/chains";
 
 export function InfluencerCard({ entry }: { entry: InfluencerDirectoryEntry }) {
   return (
@@ -30,7 +31,7 @@ export function InfluencerCard({ entry }: { entry: InfluencerDirectoryEntry }) {
       )}
 
       <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-        <Field label="Chain" value="Solana" />
+        <Field label="Primary chain" value={chainLabel(entry.primary_chain)} />
         <Field
           label="Public Wallets"
           value={`${entry.verified_wallet_count}/${entry.wallet_count} attributed`}

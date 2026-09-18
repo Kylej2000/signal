@@ -13,6 +13,7 @@ import {
   formatUtcDateTime,
   timeAgo,
 } from "@/lib/format";
+import { chainLabel, transactionUrl } from "@/lib/chains";
 
 export const dynamic = "force-dynamic";
 
@@ -85,12 +86,12 @@ export default async function SignalDetail({
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
               <Detail label="Purchase (USD)" value={formatUsd(tx.usd_value)} accent="buy" />
               <Detail label="Tokens received" value={formatTokenAmount(tx.token_amount)} />
-              <Detail label="SOL spent" value={tx.sol_amount ? `${tx.sol_amount} SOL` : "—"} />
+              <Detail label="Quote amount" value={tx.quote_amount ? `${tx.quote_amount} ${tx.quote_symbol ?? ""}` : "—"} />
               <Detail label="Market cap at tx" value={`$${compactNumber(tx.market_cap)}`} />
               <Detail label="Liquidity at tx" value={`$${compactNumber(tx.liquidity)}`} />
               <Detail label="Price at tx" value={formatPrice(tx.token_price)} />
               <Detail label="DEX" value={tx.dex ?? "—"} />
-              <Detail label="Blockchain" value="Solana" />
+              <Detail label="Blockchain" value={chainLabel(tx.chain)} />
               <Detail
                 label="Wallet"
                 value={tx.wallet_address_masked ?? "Unattributed"}
@@ -130,7 +131,7 @@ export default async function SignalDetail({
           {/* External actions */}
           <div className="mt-6 flex flex-wrap items-center gap-2">
             {isBuySell && tx && (
-              <ExternalButton href={`https://solscan.io/tx/${tx.transaction_hash}`} primary>
+              <ExternalButton href={transactionUrl(tx.chain, tx.transaction_hash)} primary>
                 View Transaction
               </ExternalButton>
             )}

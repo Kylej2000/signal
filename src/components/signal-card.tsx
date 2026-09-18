@@ -14,6 +14,7 @@ import {
 } from "@/lib/format";
 import { useNow } from "@/lib/use-now";
 import { clsx } from "@/lib/clsx";
+import { chainLabel, transactionUrl } from "@/lib/chains";
 
 export function SignalCard({ item, isNew }: { item: FeedItem; isNew?: boolean }) {
   const now = useNow();
@@ -102,14 +103,14 @@ function BuyCard({ item, now }: { item: FeedItem; now: Date }) {
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Badge tone="muted">Solana</Badge>
+          <Badge tone="muted">{chainLabel(tx.chain)}</Badge>
           {tx.wallet_address_masked && (
             <span className="tabular text-[11px] text-faint">{tx.wallet_address_masked}</span>
           )}
           <span className="text-[11px] text-faint">· detected {latency}s after tx</span>
         </div>
         <div className="flex items-center gap-2" onClick={(e) => e.preventDefault()}>
-          <ExternalButton href={`https://solscan.io/tx/${tx.transaction_hash}`}>
+          <ExternalButton href={transactionUrl(tx.chain, tx.transaction_hash)}>
             Transaction
           </ExternalButton>
           {item.token?.dexscreener_url && (

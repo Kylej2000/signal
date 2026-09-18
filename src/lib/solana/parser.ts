@@ -12,6 +12,7 @@
  */
 
 import { QUOTE_MINTS, isQuoteMint } from "@/lib/config";
+import type { Chain } from "@/lib/types";
 
 const WSOL_MINT = "So11111111111111111111111111111111111111112";
 const LAMPORTS_PER_SOL = 1_000_000_000;
@@ -19,6 +20,7 @@ const LAMPORTS_PER_SOL = 1_000_000_000;
 const MIN_SOL_SPEND = 0.001;
 
 export interface ParsedSwap {
+  chain?: Chain;
   walletAddress: string;
   signature: string;
   type: "buy" | "sell";
@@ -30,6 +32,7 @@ export interface ParsedSwap {
   solAmount: number | null; // SOL leg specifically, if any
   dex: string | null;
   blockTime: string; // ISO
+  explorerUrl?: string;
 }
 
 interface HeliusTokenTransfer {

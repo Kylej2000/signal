@@ -31,7 +31,7 @@ export function Footer() {
         </div>
         <div className="mt-8 border-t border-ink-800 pt-4 text-[11px] text-faint">
           © {new Date().getFullYear()} Signal. Public data only. Not affiliated with any
-          person or token shown. Solana-only MVP.
+          person, wallet, chain or token shown. Multichain tracking is best-effort.
         </div>
       </div>
     </footer>

@@ -1,6 +1,15 @@
 /** Domain types shared across the app (mirrors the Postgres schema). */
 
-export type Chain = "solana";
+export type Chain =
+  | "solana"
+  | "ethereum"
+  | "bnb"
+  | "avalanche"
+  | "base"
+  | "arbitrum"
+  | "optimism"
+  | "polygon"
+  | "robinhood_chain";
 
 export type VerificationStatus =
   | "verified"
@@ -68,6 +77,8 @@ export interface Transaction {
   transaction_type: TransactionType;
   token_amount: number | null;
   sol_amount: number | null;
+  quote_amount: number | null;
+  quote_symbol: string | null;
   usd_value: number | null;
   token_price: number | null;
   market_cap: number | null;
@@ -136,6 +147,7 @@ export interface FeedItem {
     contract_address: string;
     image_url: string | null;
     dexscreener_url: string | null;
+    chain?: Chain;
   } | null;
 
   // Present for wallet_buy / wallet_sell
@@ -146,6 +158,8 @@ export interface FeedItem {
     usd_value: number | null;
     token_amount: number | null;
     sol_amount: number | null;
+    quote_amount?: number | null;
+    quote_symbol?: string | null;
     market_cap: number | null;
     liquidity: number | null;
     token_price: number | null;
@@ -154,6 +168,7 @@ export interface FeedItem {
     detected_at: string;
     price_source: string | null;
     wallet_address_masked: string | null;
+    chain?: Chain;
   } | null;
 
   // Present for social_mention / correlated

@@ -24,8 +24,7 @@ import {
   type TokenLite,
 } from "@/lib/social/matcher";
 import type { PublicPost } from "@/lib/social/twitter";
-
-const CHAIN = "solana";
+import type { Chain } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // Wallet buy / sell
@@ -35,6 +34,7 @@ export interface WalletRecord {
   influencer_id: string;
   address: string;
   verification_status: string;
+  chain?: Chain;
 }
 
 export async function processParsedSwap(
@@ -46,14 +46,15 @@ export async function processParsedSwap(
     // Enrich token first (so the token upsert has metadata) using block time
     // for a historical price snapshot where possible.
     const blockUnix = Math.floor(new Date(parsed.blockTime).getTime() / 1000);
-    const enriched = await enrichToken(parsed.tokenMint, blockUnix);
+    const chain = parsed.chain ?? wallet.chain ?? "solana";
+    const enriched = await enrichToken(parsed.tokenMint, blockUnix, chain);
 
     // Upsert token.
     const { data: tokenRow, error: tokenErr } = await supabase
       .from("tokens")
       .upsert(
         {
-          chain: CHAIN,
+          chain,
           contract_address: parsed.tokenMint,
           symbol: enriched.symbol,
           name: enriched.name,
@@ -89,6 +90,8 @@ export async function processParsedSwap(
         transaction_type: parsed.type,
         token_amount: parsed.tokenAmount,
         sol_amount: parsed.solAmount,
+        quote_amount: parsed.quoteAmount,
+        quote_symbol: parsed.quoteSymbol,
         usd_value: usd,
         token_price: enriched.token_price,
         market_cap: enriched.market_cap,
@@ -135,7 +138,7 @@ export async function processParsedSwap(
       marketCap: enriched.market_cap,
       liquidity: enriched.liquidity,
       dex: parsed.dex ?? enriched.dex,
-      chain: "Solana",
+      chain: chainLabel(chain),
       walletMasked: attributed ? maskAddress(wallet.address) : null,
       detectionSeconds: detectionLatencySeconds(parsed.blockTime, detectedAt),
       txHash: parsed.signature,
@@ -147,6 +150,15 @@ export async function processParsedSwap(
   } catch (e) {
     return { status: "error", detail: (e as Error).message };
   }
+}
+
+function chainLabel(chain: Chain): string {
+  const labels: Record<Chain, string> = {
+    solana: "Solana", ethereum: "Ethereum", bnb: "BNB Chain",
+    avalanche: "Avalanche", base: "Base", arbitrum: "Arbitrum",
+    optimism: "Optimism", polygon: "Polygon", robinhood_chain: "Robinhood Chain",
+  };
+  return labels[chain];
 }
 
 // ---------------------------------------------------------------------------
