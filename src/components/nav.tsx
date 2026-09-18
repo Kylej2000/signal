@@ -6,10 +6,9 @@ import { clsx } from "@/lib/clsx";
 import { useState } from "react";
 
 const links = [
-  { href: "/", label: "Dashboard" },
-  { href: "/influencers", label: "Influencers" },
-  { href: "/feed", label: "Live Feed" },
-  { href: "/how-it-works", label: "How It Works" },
+  { href: "/", label: "Buy Feed" },
+  { href: "/influencers", label: "Tracked Wallets" },
+  { href: "/admin", label: "Manage" },
 ];
 
 export function Nav() {
@@ -52,10 +51,10 @@ export function Nav() {
 
         <div className="flex items-center gap-2">
           <Link
-            href="/feed"
+            href="/admin"
             className="hidden rounded-lg bg-signal px-3.5 py-1.5 text-sm font-semibold text-ink-950 transition-colors hover:bg-signal-bright sm:inline-flex"
           >
-            Get Alerts
+            Add Wallet
           </Link>
           <button
             className="rounded-md border border-ink-700 p-1.5 text-muted md:hidden"

@@ -11,27 +11,22 @@ export function Footer() {
               <span className="text-sm font-bold uppercase tracking-[0.28em]">Signal</span>
             </div>
             <p className="mt-3 text-xs leading-relaxed text-faint">
-              Signal displays publicly available blockchain and social-media activity for
-              informational purposes. Wallet attribution may be incomplete or inaccurate.
-              Nothing displayed constitutes financial advice.
+              Personal monitoring dashboard for publicly visible blockchain activity.
+              Wallet attribution may be incomplete or inaccurate. Nothing displayed is financial advice.
             </p>
           </div>
           <div className="flex gap-10 text-sm">
             <div className="flex flex-col gap-2">
-              <span className="text-[11px] uppercase tracking-wider text-faint">Product</span>
-              <Link href="/feed" className="text-muted hover:text-fg">Live Feed</Link>
-              <Link href="/influencers" className="text-muted hover:text-fg">Influencers</Link>
-              <Link href="/how-it-works" className="text-muted hover:text-fg">How It Works</Link>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="text-[11px] uppercase tracking-wider text-faint">Admin</span>
-              <Link href="/admin" className="text-muted hover:text-fg">Admin Panel</Link>
+              <span className="text-[11px] uppercase tracking-wider text-faint">Shortcuts</span>
+              <Link href="/" className="text-muted hover:text-fg">Wallet Buy Feed</Link>
+              <Link href="/influencers" className="text-muted hover:text-fg">Tracked Wallets</Link>
+              <Link href="/admin" className="text-muted hover:text-fg">Manage Tracking</Link>
             </div>
           </div>
         </div>
         <div className="mt-8 border-t border-ink-800 pt-4 text-[11px] text-faint">
           © {new Date().getFullYear()} Signal. Public data only. Not affiliated with any
-          person, wallet, chain or token shown. Multichain tracking is best-effort.
+          person, wallet, chain or token shown. Monitoring is best-effort.
         </div>
       </div>
     </footer>

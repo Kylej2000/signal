@@ -6,9 +6,9 @@ import { DemoBanner } from "@/components/demo-badge";
 import { isDemoMode } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "Signal — Know when they buy. Before they post.",
+  title: "Signal — Personal Wallet Buy Tracker",
   description:
-    "Real-time alerts when tracked crypto influencers buy tokens from publicly identified wallets — and when they mention them on X.",
+    "A personal dashboard for monitoring token purchases by selected public crypto wallets.",
 };
 
 export default function RootLayout({

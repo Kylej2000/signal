@@ -58,10 +58,12 @@ export function LiveFeed({
   initialItems,
   influencers,
   demo,
+  buyOnly = false,
 }: {
   initialItems: FeedItem[];
   influencers: { slug: string; name: string }[];
   demo: boolean;
+  buyOnly?: boolean;
 }) {
   const [items, setItems] = useState<FeedItem[]>(initialItems);
   const [filters, setFilters] = useState<FeedFilterState>(defaultFilters);
@@ -70,6 +72,7 @@ export function LiveFeed({
   const seen = useRef<Set<string>>(new Set(initialItems.map((i) => i.id)));
 
   const prepend = useCallback((incoming: FeedItem) => {
+    if (buyOnly && incoming.signal_type !== "wallet_buy") return;
     if (seen.current.has(incoming.id)) return;
     seen.current.add(incoming.id);
     setItems((prev) => [incoming, ...prev].slice(0, 250));
@@ -81,7 +84,7 @@ export function LiveFeed({
         return next;
       });
     }, 1500);
-  }, []);
+  }, [buyOnly]);
 
   // --- Live mode: subscribe to Supabase realtime inserts on `signals` --------
   useEffect(() => {
@@ -128,7 +131,10 @@ export function LiveFeed({
     };
   }, [demo, live, initialItems, prepend]);
 
-  const visible = useMemo(() => items.filter((i) => passes(i, filters)), [items, filters]);
+  const visible = useMemo(
+    () => items.filter((i) => (!buyOnly || i.signal_type === "wallet_buy") && passes(i, filters)),
+    [items, filters, buyOnly],
+  );
 
   return (
     <div className="flex flex-col gap-4">

@@ -10,13 +10,12 @@ export default async function InfluencersPage() {
     <div className="py-8">
       <div className="mb-6">
         <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-signal/80">
-          Directory
+          Wallet list
         </div>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">Tracked influencers</h1>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight">Tracked people and wallets</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Public figures whose publicly identified blockchain wallets and X accounts are
-          monitored. Wallet attribution is labelled by verification status — only verified
-          and publicly disclosed wallets generate production alerts by default.
+          The wallets included in your personal buy monitor. Attribution status shows how
+          confidently each wallet is connected to the named person.
         </p>
       </div>
 
