@@ -89,6 +89,16 @@ export default function AdminPage() {
     await load();
   };
 
+  const importEvm = async () => {
+    setError(null);
+    setNotice(null);
+    const res = await fetch("/api/admin/import-evm", { method: "POST", headers: headers() });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) return setError(json.error ?? "EVM import failed.");
+    setNotice(json.message ?? "EVM wallets imported.");
+    await load();
+  };
+
   if (!authed) {
     return (
       <div className="mx-auto max-w-sm py-24">
@@ -167,6 +177,9 @@ export default function AdminPage() {
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Tracked influencers & wallets</h2>
           <div className="flex items-center gap-4">
+            <button onClick={importEvm} className="text-xs font-semibold text-signal hover:underline">
+              Import sourced EVM wallets
+            </button>
             <button onClick={importKols} className="text-xs font-semibold text-signal hover:underline">
               Import top 50 KOL wallets
             </button>
@@ -225,193 +238,3 @@ function AddInfluencerForm({ onSubmit }: { onSubmit: (b: unknown) => Promise<boo
     <form
       onSubmit={async (e) => {
         e.preventDefault();
-        const ok = await onSubmit({
-          ...f,
-          followers: f.followers ? Number(f.followers) : null,
-        });
-        if (ok) setF({ name: "", x_handle: "", followers: "", profile_image: "", description: "" });
-      }}
-      className="rounded-xl border border-ink-700 bg-ink-850 p-5"
-    >
-      <h3 className="text-sm font-semibold">Add influencer</h3>
-      <div className="mt-4 space-y-3">
-        <Input label="Display name *" value={f.name} onChange={(v) => setF({ ...f, name: v })} required />
-        <Input label="X handle (without @)" value={f.x_handle} onChange={(v) => setF({ ...f, x_handle: v })} />
-        <Input label="Followers" value={f.followers} onChange={(v) => setF({ ...f, followers: v })} type="number" />
-        <Input label="Profile image URL" value={f.profile_image} onChange={(v) => setF({ ...f, profile_image: v })} />
-        <Input label="Description / category" value={f.description} onChange={(v) => setF({ ...f, description: v })} />
-      </div>
-      <Submit>Add influencer</Submit>
-    </form>
-  );
-}
-
-function AddWalletForm({
-  influencers,
-  onSubmit,
-}: {
-  influencers: AdminInfluencer[];
-  onSubmit: (b: unknown) => Promise<boolean>;
-}) {
-  const [f, setF] = useState({
-    influencer_id: "",
-    address: "",
-    chain: "solana",
-    label: "",
-    verification_status: "publicly_disclosed",
-    verification_source: "",
-    active: true,
-  });
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const ok = await onSubmit(f);
-        if (ok) setF({ ...f, address: "", label: "", verification_source: "" });
-      }}
-      className="rounded-xl border border-ink-700 bg-ink-850 p-5"
-    >
-      <h3 className="text-sm font-semibold">Add wallet</h3>
-      <div className="mt-4 space-y-3">
-        <Field label="Influencer *">
-          <select
-            required
-            value={f.influencer_id}
-            onChange={(e) => setF({ ...f, influencer_id: e.target.value })}
-            className="w-full rounded-lg border border-ink-700 bg-ink-900 px-3 py-2 text-sm outline-none focus:border-signal/50"
-          >
-            <option value="">Select…</option>
-            {influencers.map((i) => (
-              <option key={i.id} value={i.id}>
-                {i.name}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Input label="Address *" value={f.address} onChange={(v) => setF({ ...f, address: v })} required mono />
-        <Field label="Blockchain">
-          <select
-            value={f.chain}
-            onChange={(e) => setF({ ...f, chain: e.target.value })}
-            className="w-full rounded-lg border border-ink-700 bg-ink-900 px-3 py-2 text-sm outline-none focus:border-signal/50"
-          >
-            <option value="solana">Solana</option>
-            <option value="ethereum">Ethereum</option>
-            <option value="bnb">BNB Chain</option>
-            <option value="avalanche">Avalanche C-Chain</option>
-            <option value="base">Base</option>
-            <option value="arbitrum">Arbitrum One</option>
-            <option value="optimism">Optimism</option>
-            <option value="polygon">Polygon</option>
-            <option value="robinhood_chain">Robinhood Chain</option>
-          </select>
-        </Field>
-        <Input label="Label" value={f.label} onChange={(v) => setF({ ...f, label: v })} />
-        <Field label="Verification status">
-          <select
-            value={f.verification_status}
-            onChange={(e) => setF({ ...f, verification_status: e.target.value })}
-            className="w-full rounded-lg border border-ink-700 bg-ink-900 px-3 py-2 text-sm outline-none focus:border-signal/50"
-          >
-            <option value="verified">Verified</option>
-            <option value="publicly_disclosed">Publicly Disclosed</option>
-            <option value="community_reported">Community Reported</option>
-            <option value="unverified">Unverified</option>
-          </select>
-        </Field>
-        <Input
-          label="Verification source URL"
-          value={f.verification_source}
-          onChange={(v) => setF({ ...f, verification_source: v })}
-        />
-        <label className="flex items-center gap-2 text-sm text-muted">
-          <input
-            type="checkbox"
-            checked={f.active}
-            onChange={(e) => setF({ ...f, active: e.target.checked })}
-          />
-          Active (monitoring)
-        </label>
-      </div>
-      <Submit>Add wallet</Submit>
-      <p className="mt-3 text-[11px] text-faint">
-        On save, Signal syncs the monitored-address list to your Helius webhook (when
-        configured).
-      </p>
-    </form>
-  );
-}
-
-function chainLabel(chain: string): string {
-  const labels: Record<string, string> = {
-    solana: "Solana", ethereum: "Ethereum", bnb: "BNB", avalanche: "Avalanche",
-    base: "Base", arbitrum: "Arbitrum", optimism: "Optimism", polygon: "Polygon",
-    robinhood_chain: "Robinhood Chain",
-  };
-  return labels[chain] ?? chain;
-}
-
-function VerifBadge({ status }: { status: string }) {
-  const tone =
-    status === "verified" || status === "publicly_disclosed"
-      ? "verified"
-      : status === "community_reported"
-        ? "warn"
-        : "muted";
-  const label =
-    status === "publicly_disclosed"
-      ? "Publicly Disclosed"
-      : status.charAt(0).toUpperCase() + status.slice(1).replace("_", " ");
-  return <Badge tone={tone as any}>{label}</Badge>;
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="mb-1 block text-xs text-faint">{label}</label>
-      {children}
-    </div>
-  );
-}
-
-function Input({
-  label,
-  value,
-  onChange,
-  type = "text",
-  required,
-  mono,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  required?: boolean;
-  mono?: boolean;
-}) {
-  return (
-    <Field label={label}>
-      <input
-        type={type}
-        value={value}
-        required={required}
-        onChange={(e) => onChange(e.target.value)}
-        className={clsx(
-          "w-full rounded-lg border border-ink-700 bg-ink-900 px-3 py-2 text-sm outline-none focus:border-signal/50",
-          mono && "tabular",
-        )}
-      />
-    </Field>
-  );
-}
-
-function Submit({ children }: { children: React.ReactNode }) {
-  return (
-    <button
-      type="submit"
-      className="mt-4 w-full rounded-lg bg-signal px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-bright"
-    >
-      {children}
-    </button>
-  );
-}
