@@ -13,6 +13,8 @@ alter table transactions add column if not exists quote_symbol text;
 update transactions set quote_amount = sol_amount, quote_symbol = 'SOL'
 where quote_amount is null and sol_amount is not null;
 
+drop view if exists feed_signals;
+
 create or replace view feed_signals as
 select
   s.id, s.signal_type, s.created_at, s.seconds_between,
