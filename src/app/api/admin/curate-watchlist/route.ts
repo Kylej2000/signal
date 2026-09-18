@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 const PEOPLE = [
   ["Ansem", "blknoiz06", "Solana, altcoins, memecoins"],
-  ["CryptoGodJohn", "CryptoGodJohn", "Altcoins, on-chain plays, trading"],
+  ["Crypto God John", "CryptoGodJohn", "Altcoins, on-chain plays, trading"],
   ["Alex Becker", "ZssBecker", "Altcoins, gaming, AI/crypto"],
   ["Cobie", "cobie", "Crypto markets, narratives"],
   ["Murad Mahmudov", "MustStopMurad", "Memecoins, crypto narratives"],
@@ -44,7 +44,7 @@ const WALLETS = [
     source: "https://m.theblockbeats.info/en/news/54727", label: "Widely reported public wallet",
   },
   {
-    name: "CryptoGodJohn", address: "5GmQHd4vQ2eeGHTr6ifEDYG8aHNxBiv14XK9cQvNvfGS", chain: "solana",
+    name: "Crypto God John", address: "5GmQHd4vQ2eeGHTr6ifEDYG8aHNxBiv14XK9cQvNvfGS", chain: "solana",
     source: "https://app.cielo.finance/profile/5GmQHd4vQ2eeGHTr6ifEDYG8aHNxBiv14XK9cQvNvfGS/activity", label: "Cielo community attribution",
   },
   ...["ethereum", "bnb", "avalanche", "base", "arbitrum", "optimism", "polygon"].map((chain) => ({
@@ -92,4 +92,3 @@ export async function POST(req: Request) {
     profiles: rows.length, walletRecords: walletRows.length, removed: removed?.length ?? 0,
   });
 }
-
