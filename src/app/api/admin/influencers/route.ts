@@ -79,3 +79,25 @@ export async function POST(req: Request) {
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ message: `Added ${body.name}.`, influencer: data });
 }
+
+const SAMPLE_WALLETS = [
+  "Aacn8Xy1Q9m2r4t6u8w0z2b4d6f8h0j2k4m6p8r8YSC",
+  "BdxLp5Kq3n1v7c9x2z4b6d8f0h2j4l6n8p0r2t4v6WQE",
+  "Dm4Wn6Ju8q0t2v4x6z8b0d2f4h6j8l0n2p4r6t8v0YRK",
+  "Ck9Rm2Ht4p6s8u0w2y4a6c8e0g2i4k6m8o0q2s4u6TZP",
+];
+
+/** Remove the fictional seed records without touching genuine tracked wallets. */
+export async function DELETE(req: Request) {
+  if (!checkAdminAuth(req)) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const supabase = getAdminClient();
+  if (!supabase) return NextResponse.json({ error: "Supabase not configured" }, { status: 400 });
+
+  const { error: walletError } = await supabase.from("wallets").delete().in("address", SAMPLE_WALLETS);
+  if (walletError) return NextResponse.json({ error: walletError.message }, { status: 400 });
+  const { error: influencerError } = await supabase
+    .from("influencers").delete().in("slug", ["defi-dan", "solana-sasha"]);
+  if (influencerError) return NextResponse.json({ error: influencerError.message }, { status: 400 });
+
+  return NextResponse.json({ message: "Sample records removed." });
+}
