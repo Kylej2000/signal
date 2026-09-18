@@ -99,6 +99,16 @@ export default function AdminPage() {
     await load();
   };
 
+  const curateWatchlist = async () => {
+    setError(null);
+    setNotice(null);
+    const res = await fetch("/api/admin/curate-watchlist", { method: "POST", headers: headers() });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) return setError(json.error ?? "Watchlist update failed.");
+    setNotice(json.message ?? "Curated watchlist applied.");
+    await load();
+  };
+
   if (!authed) {
     return (
       <div className="mx-auto max-w-sm py-24">
@@ -177,6 +187,9 @@ export default function AdminPage() {
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Tracked influencers & wallets</h2>
           <div className="flex items-center gap-4">
+            <button onClick={curateWatchlist} className="text-xs font-semibold text-signal hover:underline">
+              Apply curated top 30
+            </button>
             <button onClick={importEvm} className="text-xs font-semibold text-signal hover:underline">
               Import sourced EVM wallets
             </button>
